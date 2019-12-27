@@ -20,7 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_login: 
-    path: D:\Projects\Hackathon2019\flutter_login-1.0.10+1
+    path: ..\flutter_login-1.0.10+1
   firebase_auth: ^0.15.3
   cupertino_icons: ^0.1.2
   font_awesome_flutter: ^8.5.0
