@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sync_connect/DT/dTHomeForCustomers.dart';
 import 'dropDown.dart';
 
 class DTIncidentsForEmployers extends StatefulWidget {
@@ -14,6 +15,7 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
   String _component;
   String _domain;
   String _incidentType;
+  List<Incident> _incidents;
 
   final List<String> _componentList = <String>[
     'Select component',
@@ -35,6 +37,7 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
 
   @override
   void initState() {
+    _incidents = <Incident>[];
     _domain = 'Select platform';
     _component = 'Select component';
     _incidentType = 'Internal';
@@ -44,7 +47,7 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.selectedType),
@@ -58,6 +61,9 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
               ),
               Tab(
                 text: 'Post processing',
+              ),
+              Tab(
+                text: 'Created',
               )
             ],
           ),
@@ -130,7 +136,8 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
                 children: <Widget>[
                   Text('Post processing incidents will be displayed here')
                 ],
-              )
+              ),
+              ListView(children: _getChildren())
             ],
           ),
         ),
@@ -139,73 +146,137 @@ class DTIncidentsForEmployersState extends State<DTIncidentsForEmployers> {
   }
 
   Widget _openCreateIncident(dynamic context) {
+    Incident incident = Incident();
     return AlertDialog(
       content: Form(
-        child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Text('Incident Type'),
-              DropDown(
-                  value: _incidentType,
-                  item: _incidentTypeList.map((String value) {
-                    return DropdownMenuItem<String>(
-                        value: (value != null) ? value : 'Internal',
-                        child: Text(
-                          '$value',
-                          textAlign: TextAlign.center,
-                        ));
-                  }).toList(),
-                  valueChanged: (dynamic value) {
-                    _incidentType = value;
-                  }),
-              Text('Enter Customer ID/Email'),
-              TextFormField(),
-              Text('Select Platform'),
-              DropDown(
-                  value: _domain,
-                  item: _domainList.map((String value) {
-                    return DropdownMenuItem<String>(
-                        value: (value != null) ? value : 'Select platform',
-                        child: Text(
-                          '$value',
-                          textAlign: TextAlign.center,
-                        ));
-                  }).toList(),
-                  valueChanged: (dynamic value) {
-                    _domain = value;
-                  }),
-              Text('Select Component'),
-              DropDown(
-                  value: _component,
-                  item: _componentList.map((String value) {
-                    return DropdownMenuItem<String>(
-                        value: (value != null) ? value : 'Select component',
-                        child: Text(
-                          '$value',
-                          textAlign: TextAlign.center,
-                        ));
-                  }).toList(),
-                  valueChanged: (dynamic value) {
-                    _component = value;
-                  }),
-              Text('Title'),
-              TextFormField(),
-              Text('Content'),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-              ),
-            ]),
+        child: Container(
+          width: 300,
+          height: 650,
+          child: ListView(
+              scrollDirection: Axis.vertical,
+              children: <Widget>[
+                Text('Incident Type'),
+                DropDown(
+                    value: _incidentType,
+                    item: _incidentTypeList.map((String value) {
+                      return DropdownMenuItem<String>(
+                          value: (value != null) ? value : 'Internal',
+                          child: Text(
+                            '$value',
+                            textAlign: TextAlign.center,
+                          ));
+                    }).toList(),
+                    valueChanged: (dynamic value) {
+                      _incidentType = value;
+                    }),
+                Text('Enter Customer ID/Email'),
+                TextFormField(),
+                Text('Select Platform'),
+                DropDown(
+                    value: _domain,
+                    item: _domainList.map((String value) {
+                      return DropdownMenuItem<String>(
+                          value: (value != null) ? value : 'Select platform',
+                          child: Text(
+                            '$value',
+                            textAlign: TextAlign.center,
+                          ));
+                    }).toList(),
+                    valueChanged: (dynamic value) {
+                      _domain = value;
+                      incident.platform = value;
+                      if (value == 'Select platform') incident.platform = null;
+                    }),
+                Text('Select Component'),
+                DropDown(
+                    value: _component,
+                    item: _componentList.map((String value) {
+                      return DropdownMenuItem<String>(
+                          value: (value != null) ? value : 'Select component',
+                          child: Text(
+                            '$value',
+                            textAlign: TextAlign.center,
+                          ));
+                    }).toList(),
+                    valueChanged: (dynamic value) {
+                      _component = value;
+                      incident.component = value;
+                      if (value == 'Select component') incident.component = null;
+                    }),
+                Text('Title'),
+                TextFormField(
+                  onChanged: (String value){
+                    incident.title = value;
+                  },
+                ),
+                Text('Content'),
+                TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  onChanged: (String value){
+                    incident.content = value;
+                  },
+                ),
+              ]),
+        )
       ),
       actions: <Widget>[
         RaisedButton(
           child: Text('Submit'),
           onPressed: () {
             Navigator.pop(context);
+            setState(() {
+              if (incident.title.isNotEmpty || incident.content.isNotEmpty) {
+                _incidents.add(incident);
+              }
+            });
           },
         )
       ],
     );
+  }
+
+  List<Widget> _getChildren() {
+    List<Widget> _children = <Widget>[];
+    if (_incidents == null || _incidents.isEmpty) {
+      _children.add(Text('No Incidents created by you'));
+    } else {
+      for (int i = 0; i < _incidents.length; i++) {
+        _incidents[i].component = _incidents[i].component ?? 'General';
+        _incidents[i].platform = _incidents[i].platform ?? 'General';
+        _children.add(Card(
+            color: Colors.purple,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                  style: BorderStyle.solid, color: Colors.teal[600], width: 5),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            margin: EdgeInsets.all(10),
+            elevation: 30,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  title: Text(
+                    _incidents[i].title ?? '',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    _incidents[i].content ?? '',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    _incidents[i].platform + ' | ' + _incidents[i].component,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              ],
+            )));
+      }
+    }
+
+    return _children;
   }
 }

@@ -36,11 +36,15 @@ class DTHomeForCustomersState extends State<DTHomeForCustomers> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DT Home'),
+        backgroundColor: Colors.purple,
+        title: Center(
+          child: Text('DT Home'),
+        ),
         leading: Icon(Icons.perm_identity),
         actions: <Widget>[Icon(Icons.notifications_active)],
       ),
       body: ListView(
+        scrollDirection: Axis.vertical,
         children: _getChildren(),
       ),
       floatingActionButton: FloatingActionButton(
@@ -62,12 +66,41 @@ class DTHomeForCustomersState extends State<DTHomeForCustomers> {
       _children.add(Text('No Incidents creates'));
     } else {
       for (int i = 0; i < _incidents.length; i++) {
-        _children.add((ListTile(
-          title: Text(_incidents[i].title),
-          subtitle: Text(_incidents[i].content),
-        )));
+        _incidents[i].component = _incidents[i].component ?? 'General';
+        _incidents[i].platform = _incidents[i].platform ?? 'General';
+        _children.add(Card(
+            color: Colors.purple,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                  style: BorderStyle.solid, color: Colors.teal[600], width: 5),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            margin: EdgeInsets.all(10),
+            elevation: 30,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ListTile(
+                  title: Text(
+                    _incidents[i].title ?? '',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  subtitle: Text(
+                    _incidents[i].content ?? '',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    _incidents[i].platform + ' | ' + _incidents[i].component,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              ],
+            )));
       }
     }
+
     return _children;
   }
 
@@ -75,57 +108,63 @@ class DTHomeForCustomersState extends State<DTHomeForCustomers> {
     Incident incident = Incident();
     return AlertDialog(
       content: Form(
-        child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text('Enter Customer ID/Email'),
-              TextFormField(
-                onChanged: (String value) {
-                  incident.customerID = value;
-                },
-              ),
-              Text('Select Platform'),
-              DropDown(
-                  value: _domain,
-                  item: _domainList.map((String value) {
-                    return DropdownMenuItem<String>(
-                        value: (value != null) ? value : 'Select platform',
-                        child: Text(
-                          '$value',
-                          textAlign: TextAlign.center,
-                        ));
-                  }).toList(),
-                  valueChanged: (dynamic value) {
-                    _domain = value;
-                  }),
-              Text('Select Component'),
-              DropDown(
-                  value: _component,
-                  item: _componentList.map((String value) {
-                    return DropdownMenuItem<String>(
-                        value: (value != null) ? value : 'Select component',
-                        child: Text(
-                          '$value',
-                          textAlign: TextAlign.center,
-                        ));
-                  }).toList(),
-                  valueChanged: (dynamic value) {
-                    _component = value;
-                  }),
-              Text('Title'),
-              TextFormField(onChanged: (String value) {
-                incident.title = value;
-              }),
-              Text('Content'),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                onChanged: (String value) {
-                  incident.content = value;
-                },
-              ),
-            ]),
+        child: Container(
+          width: 300,
+          height: 650,
+          child: ListView(scrollDirection: Axis.vertical, children: <Widget>[
+            Text('Enter Customer ID/Email'),
+            TextFormField(
+              onChanged: (String value) {
+                incident.customerID = value;
+              },
+            ),
+            Text('Select Platform'),
+            DropDown(
+                value: _domain,
+                item: _domainList.map((String value) {
+                  return DropdownMenuItem<String>(
+                      value: (value != null) ? value : 'Select platform',
+                      child: Text(
+                        '$value',
+                        textAlign: TextAlign.center,
+                      ));
+                }).toList(),
+                valueChanged: (dynamic value) {
+                  _domain = value;
+                  incident.platform = value;
+                  if (value == 'Select platform') incident.platform = null;
+                }),
+            Text('Select Component'),
+            DropDown(
+                value: _component,
+                item: _componentList.map((String value) {
+                  return DropdownMenuItem<String>(
+                      value: (value != null) ? value : 'Select component',
+                      child: Text(
+                        '$value',
+                        textAlign: TextAlign.center,
+                      ));
+                }).toList(),
+                valueChanged: (dynamic value) {
+                  _component = value;
+                  incident.component = value;
+                  if(value == 'Select component')
+                    incident.component = null;
+                }),
+            Text('Title'),
+            TextFormField(onChanged: (String value) {
+              incident.title = value;
+            }),
+            Text('Content'),
+            TextFormField(
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              onChanged: (String value) {
+                incident.content = value;
+              },
+            ),
+          ]),
+        ),
       ),
       actions: <Widget>[
         RaisedButton(
@@ -148,4 +187,13 @@ class Incident {
   String customerID;
   String title;
   String content;
+  String platform;
+  String component;
+}
+
+typedef IncidentCreated = void Function(
+    CreatedIncidentDetails createdIncidentDetails);
+
+class CreatedIncidentDetails{
+  Incident incident;
 }
