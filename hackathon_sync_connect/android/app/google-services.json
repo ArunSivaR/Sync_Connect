@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "143019363493",
+    "firebase_url": "https://syncconnect-c0c5e.firebaseio.com",
+    "project_id": "syncconnect-c0c5e",
+    "storage_bucket": "syncconnect-c0c5e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143019363493:android:86f74cb14464f1f821114c",
+        "android_client_info": {
+          "package_name": "com.example.hackathon_sync_connect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143019363493-2bmf1928g5b3ak87n6m0tl07odrpjh8h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.hackathon_sync_connect",
+            "certificate_hash": "b0796b8ae1b402acd7215a748b4cc9e150057faa"
+          }
+        },
+        {
+          "client_id": "143019363493-9o8c5pkm7muvvuj1kdi3ikh4if8tukil.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2HQdZsKN5AZ56R41FUXIXYlH4ER8gMxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143019363493-9o8c5pkm7muvvuj1kdi3ikh4if8tukil.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
